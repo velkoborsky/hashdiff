@@ -17,6 +17,8 @@ def cli_main():
     args_raw = parse_args()  # argparse
     cli_args = extract_args(args_raw)  # processing argparse output
 
+    # TODO: initialize logger
+
     output = main(cli_args.prev, cli_args.curr, cli_args.normalize_paths)
 
     print_output(output, cli_args.max_lines)

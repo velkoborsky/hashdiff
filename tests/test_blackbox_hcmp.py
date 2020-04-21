@@ -1,32 +1,10 @@
 import pytest
-import os
-from pathlib import Path, PurePosixPath
 
 from hashdiff.hcmp import SCRIPT_NAME
 from hcmp.hcmp import cli_main
 
-
-@pytest.fixture()
-def samples_dir():
-    test_dir = Path(os.path.abspath(__file__))
-    samples_dir = test_dir.parent / "samples"
-    fix_mtimes(samples_dir)
-    return samples_dir
-
-
-def fix_mtimes(samples_dir):
-    """
-    Updates sample file mtimes to those expected in reference outputs (mtimes not preserved by git)
-    """
-    with (samples_dir / 'reference_mtimes').open('rt') as reference_mtimes:
-        for line in reference_mtimes:
-            path, ref_mtime_str = line.strip().split()
-            full_path = samples_dir / PurePosixPath(path)
-            ref_mtime = int(ref_mtime_str)
-            curr_mtime = full_path.stat().st_mtime_ns
-            if curr_mtime != ref_mtime:
-                print("Updating modification time on ", full_path)
-                os.utime(full_path, ns=(ref_mtime, ref_mtime))
+# noinspection PyUnresolvedReferences
+from common_fixtures import samples_dir
 
 
 def test_hcmp_black_box_prints_usage(monkeypatch, capsys):

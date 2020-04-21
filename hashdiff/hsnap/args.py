@@ -53,7 +53,7 @@ def _extract_sources(args) -> List[Path]:
         return [Path(x).resolve(strict=True) for x in args.SRC] if args.SRC else [Path.cwd(), ]
     except FileNotFoundError as e:
         log.exception('Unable to resolve source %s', e.filename)
-        SystemExit(2)
+        raise SystemExit(2)
 
 
 def _extract_base_path(args, sources: List[Path]) -> Optional[Path]:
@@ -101,7 +101,7 @@ def _extract_incremental_file(args):
         return Path(args.incremental).resolve(strict=True)
     except FileNotFoundError as e:
         log.exception('Unable to resolve incremental file %s', e.filename)
-        SystemExit(1)
+        raise SystemExit(2)
 
 
 def _extract_compression(args, output_file):

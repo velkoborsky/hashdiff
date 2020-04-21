@@ -7,7 +7,7 @@ from time import perf_counter
 from typing import Dict, List, Optional
 
 from hashdiff.common import HsnapRecord
-from hashdiff.fileio import OutputSink, read_input_file
+from hashdiff.fileio import OutputSink, read_input_file, FileOutputSink
 from hashdiff.hsnap.args import parse_args, extract_args
 from hashdiff.hsnap.hash import file_sha512
 from hashdiff.hsnap.walk import scan_paths_for_files, FileStat
@@ -144,7 +144,7 @@ def main(sources, base_path, output_file, incremental_file, pickle, compress, **
     stats.log_processing_start()
 
     # open output file
-    with OutputSink(output_file, binary_pickle=pickle, compression=compress) as output_sink:
+    with FileOutputSink(output_file, binary_pickle=pickle, compression=compress) as output_sink:
         run(files, base_path, output_sink, incremental_dict, stats)
 
     stats.log_summary()

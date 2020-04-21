@@ -39,8 +39,7 @@ def extract_args(args):
         curr = Path(args.CURR).resolve(strict=True)
     except FileNotFoundError as e:
         log.exception('Unable to resolve source file %s', e.filename)
-        SystemExit(2)
-        return
+        raise SystemExit(2)
 
     normalize_paths = NormalizePaths[args.normalize_paths.upper()]  # values enforced by choices
 
@@ -52,7 +51,7 @@ def extract_args(args):
         store_result = Path(args.store_result).resolve()
         if store_result.exists() and not args.overwrite:
             log.error(f'File {store_result} already exists and -o/--overwrite argument not specified')
-            SystemExit(2)
+            raise SystemExit(2)
 
     return CliArgs(
         prev=prev,

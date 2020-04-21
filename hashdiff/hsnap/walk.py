@@ -51,7 +51,8 @@ def _scan_path(root_path: Path, visited_inodes: Set = None) -> Iterable[FileStat
             r = p.resolve(strict=True)
         except FileNotFoundError as e:
             if p.is_symlink():
-                log.warning('Invalid link {} pointing to non-existing {}'.format(p, r))
+                log.warning('Invalid link {} pointing to non-existing {}'.format(p, p.resolve()))
+                return
             else:
                 raise e  # unexpected
 
