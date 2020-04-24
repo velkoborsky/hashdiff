@@ -18,7 +18,7 @@ def parse_args():
 
     parser.add_argument('-f', '--file', help='output file name, "-" for stdout', required=True)
     parser.add_argument('-o', '--overwrite', help='overwrite out file if exists', action='store_true')
-    parser.add_argument('-v', '--verbose', help='print progress information and statistics', action='store_true')
+    parser.add_argument('-v', '--verbose', help='print progress information and statistics', action='count')
 
     parser.add_argument('-i', '--incremental', help=('quick mode - start from existing hsnap file, '
                                                      'if file size and mtime is unchanged, hash is not recalculated'))

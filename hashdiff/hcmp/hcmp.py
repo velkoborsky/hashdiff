@@ -11,13 +11,15 @@ from hashdiff.hcmp.compare import changes
 import hashdiff.hcmp.normalize as normalize
 from hashdiff.hcmp.normalize import NormalizePaths
 import hashdiff.hcmp.filter as filter
+import hashdiff.logger
 
 
 def cli_main():
     args_raw = parse_args()  # argparse
     cli_args = extract_args(args_raw)  # processing argparse output
 
-    # TODO: initialize logger
+    # initialize logger
+    hashdiff.logger.initialize_stderr_logger_from_args(args_raw)
 
     output = main(cli_args.prev, cli_args.curr, cli_args.normalize_paths)
 

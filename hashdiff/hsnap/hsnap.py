@@ -12,6 +12,7 @@ from hashdiff.hsnap.args import parse_args, extract_args
 from hashdiff.hsnap.hash import file_sha512
 from hashdiff.hsnap.walk import scan_paths_for_files, FileStat
 from hashdiff.humanizer import humanize_time, humanize_size, humanize_size_dual
+import hashdiff.logger
 
 log = logging.getLogger(__package__)
 
@@ -102,15 +103,8 @@ def cli_main():
     args_raw = parse_args()  # argparse
     cli_args = extract_args(args_raw)  # processing argparse output
 
-    # logging
-    stderr = logging.StreamHandler()
-    if cli_args.verbose:
-        log.setLevel(logging.INFO)
-        stderr.setLevel(logging.INFO)
-    else:
-        log.setLevel(logging.WARNING)
-        stderr.setLevel(logging.WARNING)
-    log.addHandler(stderr)
+    # initialize logger
+    hashdiff.logger.initialize_stderr_logger_from_args(args_raw)
 
     main(**dataclasses.asdict(cli_args))  # run main
 
