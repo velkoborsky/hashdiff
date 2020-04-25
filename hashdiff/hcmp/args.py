@@ -5,7 +5,7 @@ from typing import Optional
 from argparse import ArgumentParser
 
 from hashdiff.hcmp import SCRIPT_NAME
-from hashdiff.hcmp.normalize import NormalizePaths
+from hashdiff.normalize import NormalizePaths
 
 log = logging.getLogger(__package__)
 

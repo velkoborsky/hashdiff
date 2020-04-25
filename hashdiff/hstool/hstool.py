@@ -9,6 +9,7 @@ import hashdiff.logger
 from hashdiff.fileio import InputSource, OutputSink, NullOutputSink, FileOutputSink
 from hashdiff.hstool.args import parse_args
 from hashdiff.hstool.pathtree import input_source_to_path_tree, PathFile, PathDir
+from hashdiff.normalize import NormalizePaths
 
 log = logging.getLogger(__package__)
 
@@ -94,6 +95,9 @@ def filter(input_source: InputSource,
 
 def cli_ls(args):
     input_source = _cli_input_arg_to_input_source(args)
+
+    if args.normalize_paths:
+        input_source.normalize_paths = NormalizePaths.NATIVE
 
     tree = input_source_to_path_tree(input_source)
 

@@ -4,7 +4,7 @@ from fnmatch import fnmatch
 from pathlib import Path
 from typing import Dict, Deque, Iterable
 
-from fileio import InputSource
+from hashdiff.fileio import InputSource
 
 
 def input_source_to_path_tree(input_source: InputSource):

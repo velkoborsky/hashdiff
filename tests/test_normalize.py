@@ -1,6 +1,6 @@
 import pytest
 
-from hcmp.normalize import normalize_path_string_heuristic, NormalizePaths
+from hashdiff.normalize import normalize_path_string_heuristic, NormalizePaths
 
 
 @pytest.mark.parametrize(('input'), [

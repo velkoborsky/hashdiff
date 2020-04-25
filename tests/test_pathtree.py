@@ -1,7 +1,7 @@
 import pytest
 from pathlib import PurePosixPath
 
-from hstool.pathtree import PathDir, PathFile
+from hashdiff.hstool.pathtree import PathDir, PathFile
 
 Dir = PathDir
 File = PathFile

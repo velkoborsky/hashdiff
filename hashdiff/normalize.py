@@ -1,13 +1,14 @@
 from enum import Enum
-from pathlib import PurePosixPath, PureWindowsPath, PurePath
+from pathlib import PurePosixPath, PureWindowsPath, PurePath, Path
 
 from hashdiff.common import HsnapRecord
 
 
 class NormalizePaths(Enum):
-    POSIX = 0
-    WINDOWS = 1
-    NONE = 2
+    NONE = 0
+    POSIX = 1
+    WINDOWS = 2
+    NATIVE = 3
 
 
 _non_printable_chars = set(chr(n) for n in range(1, 32))
@@ -32,6 +33,8 @@ def normalize_path_string_heuristic(style: NormalizePaths, path: str) -> str:
             return str(PurePosixPath(p))
         elif style == NormalizePaths.WINDOWS:
             return str(PureWindowsPath(p))
+        elif style == NormalizePaths.NATIVE:
+            return str(PurePath(p))
     raise NotImplemented()
 
 

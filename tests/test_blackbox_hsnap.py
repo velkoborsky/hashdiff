@@ -6,9 +6,6 @@ from hashdiff.hsnap import SCRIPT_NAME
 from hashdiff.hsnap.hsnap import cli_main
 from hashdiff.serialize import hex2bin
 
-# noinspection PyUnresolvedReferences
-from common_fixtures import samples_dir, samples_references
-
 
 def test_hsnap_black_box_prints_usage(monkeypatch, capsys):
     monkeypatch.setattr('sys.argv', [SCRIPT_NAME, '-h'])

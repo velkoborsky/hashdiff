@@ -2,12 +2,9 @@ from pathlib import Path
 
 import pytest
 
-import fileio
-from hstool import SCRIPT_NAME
-from hstool.hstool import cli_main
-
-# noinspection PyUnresolvedReferences
-from common_fixtures import samples_dir, samples_references
+import hashdiff.fileio
+from hashdiff.hstool import SCRIPT_NAME
+from hashdiff.hstool.hstool import cli_main
 
 
 def test_hstool_black_box_prints_usage(monkeypatch, capsys):
@@ -54,8 +51,8 @@ def test_hstool_black_box_filter_split_to_file(samples_dir, monkeypatch, capsys,
     assert out == ""
     assert err == ""
 
-    matched = fileio.read_input_file(matched_out)
-    not_matched = fileio.read_input_file(not_matched_out)
+    matched = hashdiff.fileio.read_input_file(matched_out)
+    not_matched = hashdiff.fileio.read_input_file(not_matched_out)
 
     assert len(matched) > 0
     assert all([x.path.startswith('hsnap') for x in matched])
@@ -67,7 +64,7 @@ def test_hstool_black_box_filter_split_to_file(samples_dir, monkeypatch, capsys,
 def test_hstool_black_box_ls_defaults(samples_dir, monkeypatch, capsys):
     in_file = samples_dir / 'hstool' / 'hashdiff.hsn'
 
-    monkeypatch.setattr('sys.argv', [SCRIPT_NAME, 'ls'])
+    monkeypatch.setattr('sys.argv', [SCRIPT_NAME, 'ls', '--normalize-paths'])
 
     with in_file.open('rt') as in_stream:
         monkeypatch.setattr('sys.stdin', in_stream)
@@ -86,7 +83,7 @@ def test_hstool_black_box_ls_paths(samples_dir, monkeypatch, capsys):
     in_file = samples_dir / 'hstool' / 'hashdiff.hsn'
     paths = ['hsnap', 'hcmp']
 
-    monkeypatch.setattr('sys.argv', [SCRIPT_NAME, 'ls'] + paths)
+    monkeypatch.setattr('sys.argv', [SCRIPT_NAME, 'ls', '--normalize-paths'] + paths)
 
     with in_file.open('rt') as in_stream:
         monkeypatch.setattr('sys.stdin', in_stream)

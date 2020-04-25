@@ -2,9 +2,6 @@ import pytest
 
 from hashdiff.fileio import InputSource
 
-# noinspection PyUnresolvedReferences
-from common_fixtures import samples_dir, samples_references
-
 
 def test_input_source_files(samples_dir, samples_references):
     source_files = list((samples_dir / 'input_source').glob('*'))

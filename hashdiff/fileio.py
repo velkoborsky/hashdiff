@@ -13,6 +13,7 @@ from typing import Optional, List
 
 from hashdiff.common import HsnapRecord
 from hashdiff.serialize import serialize, deserialize
+from hashdiff.normalize import NormalizePaths, normalize_hsnap_record
 
 log = logging.getLogger(__name__)
 
@@ -57,8 +58,8 @@ def input_file_type_heuristic(path: Path):
     return binary_pickle, compression
 
 
-def read_input_file(file: Path) -> List[HsnapRecord]:
-    with InputSource(file) as source:
+def read_input_file(file: Path, **kwargs) -> List[HsnapRecord]:
+    with InputSource(file, **kwargs) as source:
         records = list(source)
     return records
 
@@ -68,7 +69,8 @@ class InputSource:
     def __init__(self,
                  file: Optional[Path] = None,
                  binary_pickle: Optional[bool] = None,
-                 compression: Optional[CompressionType] = None):
+                 compression: Optional[CompressionType] = None,
+                 normalize_paths: NormalizePaths = NormalizePaths.NONE):
         """
         :param file: Read file at specified path, None for stdin
         :param binary_pickle: force binary pickle mode (true/false), None for heuristic
@@ -94,6 +96,11 @@ class InputSource:
 
         if compression is None or isinstance(compression, CompressionType):
             self._compression = compression
+        else:
+            raise ValueError()
+
+        if isinstance(normalize_paths, NormalizePaths):
+            self.normalize_paths = normalize_paths
         else:
             raise ValueError()
 
@@ -175,14 +182,22 @@ class InputSource:
 
     def __iter__(self):
 
+        def normalize(h_record):
+            if self.normalize_paths == NormalizePaths.NONE:
+                return h_record
+            else:
+                return normalize_hsnap_record(self.normalize_paths, h_record)
+
         if self._is_open:
             if self._binary_pickle:
                 for h_record in self._records:
-                    yield h_record
+                    normalized = normalize(h_record)
+                    yield normalized
             else:
                 for line in self._text_stream:
                     deserialized = deserialize(line)
-                    yield deserialized
+                    normalized = normalize(deserialized)
+                    yield normalized
         else:
             raise RuntimeError("Not open yet")
 

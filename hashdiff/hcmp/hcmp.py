@@ -1,17 +1,15 @@
 import pickle
 import sys
-import functools
 from pathlib import Path
 from typing import Iterable
 
-from hashdiff.fileio import read_input_file
-from hashdiff.hcmp.summary import print_output
-from hashdiff.hcmp.args import parse_args, extract_args
-from hashdiff.hcmp.compare import changes
-import hashdiff.hcmp.normalize as normalize
-from hashdiff.hcmp.normalize import NormalizePaths
 import hashdiff.hcmp.filter as filter
 import hashdiff.logger
+from hashdiff.fileio import read_input_file
+from hashdiff.hcmp.args import parse_args, extract_args
+from hashdiff.hcmp.compare import changes
+from hashdiff.hcmp.summary import print_output
+from hashdiff.normalize import NormalizePaths
 
 
 def cli_main():
@@ -33,13 +31,8 @@ def cli_main():
 
 
 def main(prev: Path, curr: Path, normalize_paths: NormalizePaths, exclude_paths: Iterable[str] = []):
-
-    prev_records = read_input_file(prev)
-    curr_records = read_input_file(curr)
-
-    normalizer = functools.partial(normalize.normalize_hsnap_record, normalize_paths)
-    prev_records = list(map(normalizer, prev_records))
-    curr_records = list(map(normalizer, curr_records))
+    prev_records = read_input_file(prev, normalize_paths=normalize_paths)
+    curr_records = read_input_file(curr, normalize_paths=normalize_paths)
 
     exclude_paths = list(exclude_paths)
     prev_records = list(filter.filter_by_path(exclude_paths, prev_records))

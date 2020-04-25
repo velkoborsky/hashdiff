@@ -1,4 +1,3 @@
-import os
 import pytest
 
 from hashdiff.common import find_duplicate_in_sorted

@@ -1,10 +1,7 @@
 import pytest
 
 from hashdiff.hcmp import SCRIPT_NAME
-from hcmp.hcmp import cli_main
-
-# noinspection PyUnresolvedReferences
-from common_fixtures import samples_dir
+from hashdiff.hcmp.hcmp import cli_main
 
 
 def test_hcmp_black_box_prints_usage(monkeypatch, capsys):
