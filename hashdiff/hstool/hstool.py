@@ -3,11 +3,12 @@ import re
 import sys
 from argparse import Namespace
 from pathlib import Path
-from typing import Iterable, Dict
+from typing import Iterable
 
 import hashdiff.logger
 from hashdiff.fileio import InputSource, OutputSink, NullOutputSink, FileOutputSink
 from hashdiff.hstool.args import parse_args
+from hashdiff.hstool.pathtree import input_source_to_path_tree, PathFile, PathDir
 
 log = logging.getLogger(__package__)
 
@@ -96,24 +97,9 @@ def cli_ls(args):
 
     tree = input_source_to_path_tree(input_source)
 
-    matched_files = {}
-    matched_dirs = {}
-    not_matched = []
-
     queries = args.FILE
-    if len(queries) == 0:
-        queries.append(".")  # list root
-    for q in queries:
-        try:
-            obj, prefix = tree.query(q)
-            prefix.append(obj.name)
-            full_path = str(Path(*prefix))
-            if isinstance(obj, PathFile):
-                matched_files[full_path] = obj
-            else:
-                matched_dirs[full_path] = obj
-        except FileNotFoundError:
-            not_matched.append(q)
+
+    matched_dirs, matched_files, not_matched = ls(tree, queries)
 
     _cli_ls_print_output(matched_dirs, matched_files, not_matched)
 
@@ -121,6 +107,32 @@ def cli_ls(args):
         raise SystemExit(2)
     else:
         raise SystemExit(0)
+
+
+def ls(tree: PathDir, queries: Iterable[str]):
+
+    matched_files = {}
+    matched_dirs = {}
+    not_matched = []
+
+    queries = list(queries)
+    if len(queries) == 0:
+        queries.append(".")  # list root
+
+    for q in queries:
+        matches = tree.query(q)
+        if not matches:
+            not_matched.append(q)
+        else:
+            for m in matches:
+                obj, path_parts = m
+                full_path = str(Path(*path_parts))
+                if isinstance(obj, PathFile):
+                    matched_files[full_path] = obj
+                else:
+                    matched_dirs[full_path] = obj
+
+    return matched_dirs, matched_files, not_matched
 
 
 def _cli_ls_print_output(matched_dirs, matched_files, not_matched):
@@ -146,75 +158,3 @@ def _cli_ls_print_output(matched_dirs, matched_files, not_matched):
                 print()
             is_first = False
             print_dir(matched_dirs[dir], dir)
-
-
-def input_source_to_path_tree(input_source: InputSource):
-    tree = PathDir(".")
-
-    with input_source as records:
-        for h_record in records:
-            path = Path(h_record.path)
-            parts = path.parts
-            tree.add(parts)
-
-    return tree
-
-
-class PathFile:
-
-    def __init__(self, name):
-        self.name = name
-
-
-class PathDir:
-
-    def __init__(self, name, *contents):
-        self.name = name
-        self.dirs: Dict[str, PathDir] = {}
-        self.files: Dict[str, PathFile] = {}
-        for a in contents:
-            self.add(a)
-
-    def add(self, parts):
-
-        assert len(parts) > 0
-
-        if len(parts) == 1:
-            name = parts[0]
-            self.files[name] = PathFile(name)
-        else:
-            (directory, *rest) = parts
-            if directory in self.dirs:
-                self.dirs[directory].add(rest)
-            else:
-                self.dirs[directory] = PathDir(directory, rest)
-
-    def query(self, path):
-        if isinstance(path, Path):
-            return self.query_parts(path.parts)
-        if isinstance(path, str):
-            return self.query_parts(Path(path).parts)
-        else:
-            raise ValueError("Invalid query path", path)
-
-    def query_parts(self, parts, prefix=None):
-        if prefix is None:
-            prefix = []
-        if len(parts) == 0:
-            return self, prefix
-        elif len(parts) == 1:
-            name = parts[0]
-            try:
-                return self.files[name], prefix
-            except KeyError:
-                pass
-            try:
-                return self.dirs[name], prefix
-            except KeyError:
-                raise FileNotFoundError
-        else:
-            (directory, *rest) = parts
-            try:
-                return self.dirs[directory].query_parts(rest, prefix.append(directory))
-            except KeyError:
-                raise FileNotFoundError

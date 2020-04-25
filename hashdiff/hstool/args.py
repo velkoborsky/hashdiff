@@ -26,11 +26,11 @@ def construct_parser(parser: ArgumentParser):
     filter_g.add_argument('--not-matched', '-n', help='output file for records not matching any of the patterns')
 
     ls = commands.add_parser('ls',
-                             help='lists hsn file contents as if it was a directory, globs not supported')
+                             help='lists hsn file contents as if it was a directory')
 
     ls_g = ls.add_argument_group("ls command")
     ls_g.add_argument('--input', '-i', help='input file, "-" for stdin')
-    ls_g.add_argument('FILE', nargs='*', action='extend')
+    ls_g.add_argument('FILE', nargs='*', action='extend', help='files to be listed, supporting glob syntax')
 
 
 def parse_args():
