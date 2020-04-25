@@ -11,3 +11,6 @@ def build(c):
         cmd = f'pyinstaller pyinstaller/hcmp.py --onefile --workpath="{tmpdir}"'
         print(cmd)
         c.run(cmd)
+        cmd = f'pyinstaller pyinstaller/hstool.py --onefile --workpath="{tmpdir}"'
+        print(cmd)
+        c.run(cmd)

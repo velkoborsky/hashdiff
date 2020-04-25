@@ -11,7 +11,8 @@ setup(name='hashdiff',
       entry_points = {
             'console_scripts': [
                   'hsnap = hashdiff.hsnap.__main__:cli_main',
-                  'hcmp = hashdiff.hcmp.__main__:cli_main'
+                  'hcmp = hashdiff.hcmp.__main__:cli_main',
+                  'hstool = hashdiff.hstool.__main__:cli_main'
             ]
       },
       zip_safe=False)
