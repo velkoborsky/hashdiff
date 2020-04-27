@@ -3,7 +3,7 @@ import re
 import sys
 from argparse import Namespace
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Set
 
 import hashdiff.logger
 from hashdiff.fileio import InputSource, OutputSink, NullOutputSink, FileOutputSink
@@ -21,10 +21,10 @@ def cli_main():
     hashdiff.logger.initialize_stderr_logger_from_args(args_raw)
 
     # mapping of cli commands to functions
-    func = {
-        "filter": cli_filter,
-        "ls": cli_ls
-    }[args_raw.hst_command]
+    func = {'filter': cli_filter,
+            'ls': cli_ls,
+            'unique': cli_unique
+            }[args_raw.hst_command]
 
     func(args_raw)
 
@@ -32,15 +32,22 @@ def cli_main():
 
 
 def _cli_input_arg_to_input_source(args: Namespace) -> InputSource:
-    if (args.input is not None) and (args.input != "-"):
+    if args.input is None:
+        return _cli_path_to_input_source("-")
+    else:
+        return _cli_path_to_input_source(args.input)
+
+
+def _cli_path_to_input_source(path: str) -> InputSource:
+    if path == "-":
+        return InputSource()
+    else:
         try:
-            input_file = Path(args.input).resolve(strict=True)
+            input_file = Path(path).resolve(strict=True)
             return InputSource(input_file)
         except FileNotFoundError as e:
-            log.exception('Unable to resolve source file %s', e.filename)
+            log.exception('Unable to resolve file %s', e.filename)
             raise SystemExit(2)
-    else:
-        return InputSource()
 
 
 def cli_filter(args):
@@ -162,3 +169,29 @@ def _cli_ls_print_output(matched_dirs, matched_files, not_matched):
                 print()
             is_first = False
             print_dir(matched_dirs[dir], dir)
+
+
+def cli_unique(args):
+
+    input_source = _cli_input_arg_to_input_source(args)
+
+    try:
+        output_dst = args.output
+    except AttributeError:
+        output_dst = "-"
+
+    exclude_hashes: Set[bytes] = set()
+
+    for exclude_file in args.exclude_from:
+        exclude_source = _cli_path_to_input_source(exclude_file)
+        with exclude_source as exclude_records:
+            for h_record in exclude_records:
+                exclude_hashes += h_record.digest
+
+    output_sink = FileOutputSink(output_dst)
+
+    with input_source as records:
+        with output_sink as output:
+            for h_record in records:
+                if h_record.digest not in exclude_hashes:
+                    output.write(h_record)
