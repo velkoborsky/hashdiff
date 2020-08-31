@@ -53,6 +53,7 @@ def construct_subparser_unique(commands):
     grp.add_argument('--input', '-i', help='input file, "-" for stdin')
     grp.add_argument('--exclude-from', '-e', nargs='*', action='extend',
                      help='input file, "-" for stdin', required=True)
+    grp.add_argument('--output', '-o', help='output file, "-" for stdout')
 
 
 def parse_args():

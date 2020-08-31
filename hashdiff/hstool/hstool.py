@@ -178,7 +178,7 @@ def cli_unique(args):
     try:
         output_dst = args.output
     except AttributeError:
-        output_dst = "-"
+        output_dst = None
 
     exclude_hashes: Set[bytes] = set()
 
@@ -186,7 +186,7 @@ def cli_unique(args):
         exclude_source = _cli_path_to_input_source(exclude_file)
         with exclude_source as exclude_records:
             for h_record in exclude_records:
-                exclude_hashes += h_record.digest
+                exclude_hashes.add(h_record.digest)
 
     output_sink = FileOutputSink(output_dst)
 
